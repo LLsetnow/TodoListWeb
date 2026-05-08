@@ -353,6 +353,24 @@ onMounted(() => {
   outline: none;
 }
 
+.auth-input {
+  border-radius: 12px;
+}
+
+.code-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 14px;
+  width: 100%;
+}
+
+.code-input {
+  flex: 1;
+  border-radius: 12px;
+  min-width: 0;
+  margin-bottom: 0;
+}
+
 .code-row {
   display: flex;
   gap: 10px;
