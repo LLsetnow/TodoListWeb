@@ -5,6 +5,9 @@ import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import { Resend } from 'resend'
 import crypto from 'crypto'
+import { fileURLToPath } from 'url'
+import path from 'path'
+import { existsSync } from 'fs'
 
 const MONGO_URL = process.env.MONGO_URL || 'mongodb://root:0v024U15C03DApeF@test-db-mongodb.ns-27q1wqr8.svc:27017'
 const DB_NAME = process.env.DB_NAME || 'todo'
@@ -216,6 +219,23 @@ app.post('/toggle_complete', checkDB, authMiddleware, async (req, res) => {
   }
 })
 
-// Start server regardless of DB status
+// Production: serve built frontend from dist/
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+const distPath = path.join(__dirname, '..', 'dist')
+if (existsSync(distPath)) {
+  app.use(express.static(distPath))
+  // SPA fallback
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/register') || req.path.startsWith('/login') ||
+        req.path.startsWith('/verify-email') || req.path.startsWith('/fetch_tasks') ||
+        req.path.startsWith('/add_task') || req.path.startsWith('/delete_task') ||
+        req.path.startsWith('/toggle_complete')) {
+      return next()
+    }
+    res.sendFile(path.join(distPath, 'index.html'))
+  })
+}
+
+// Start server
 connectDB()
 app.listen(PORT, '0.0.0.0', () => console.log(`Server running on http://0.0.0.0:${PORT}`))
