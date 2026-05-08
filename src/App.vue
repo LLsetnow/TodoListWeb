@@ -14,6 +14,8 @@ const password2 = ref('')
 const verifyCode = ref('')
 const sending = ref(false)
 const countdown = ref(0)
+const showPassword = ref(false)
+const showPassword2 = ref(false)
 
 const value = ref('')
 const list = ref([])
@@ -177,27 +179,59 @@ onMounted(() => {
       <div v-if="authMessage" class="auth-message">{{ authMessage }}</div>
 
       <!-- Email -->
-      <input v-model="email" type="email" class="todo-input auth-input" placeholder="邮箱" />
+      <label class="input-label">邮箱</label>
+      <input v-model="email" type="email" class="todo-input auth-input" />
 
       <!-- Register mode: code + send button -->
-      <div v-if="authMode === 'register'" class="code-row">
-        <input v-model="verifyCode" type="text" class="todo-input code-input" placeholder="验证码" maxlength="6" />
-        <div
-          @click="sendCode"
-          class="send-code-btn"
-          :class="{ disabled: sending || countdown > 0 }"
-        >
-          {{ countdown > 0 ? `${countdown}s` : sending ? '...' : '发送验证码' }}
+      <template v-if="authMode === 'register'">
+        <label class="input-label">验证码</label>
+        <div class="code-row">
+          <input v-model="verifyCode" type="text" class="todo-input code-input" maxlength="6" />
+          <div
+            @click="sendCode"
+            class="send-code-btn"
+            :class="{ disabled: sending || countdown > 0 }"
+          >
+            {{ countdown > 0 ? `${countdown}s` : sending ? '...' : '发送验证码' }}
+          </div>
         </div>
-      </div>
+      </template>
 
       <!-- Password -->
-      <input v-model="password" type="password" class="todo-input auth-input" placeholder="密码"
-        @keyup.enter="authMode === 'login' ? login() : register()" />
+      <label class="input-label">密码</label>
+      <div class="password-wrapper">
+        <input v-model="password" :type="showPassword ? 'text' : 'password'" class="todo-input auth-input pw-input"
+          @keyup.enter="authMode === 'login' ? login() : register()" />
+        <span class="eye-toggle" @click="showPassword = !showPassword">
+          <svg v-if="showPassword" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#999" stroke-width="2">
+            <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/>
+            <line x1="1" y1="1" x2="23" y2="23"/>
+          </svg>
+          <svg v-else viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#999" stroke-width="2">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+        </span>
+      </div>
 
       <!-- Confirm password (register only) -->
-      <input v-if="authMode === 'register'" v-model="password2" type="password" class="todo-input auth-input" placeholder="确认密码"
-        @keyup.enter="register()" />
+      <template v-if="authMode === 'register'">
+        <label class="input-label">确认密码</label>
+        <div class="password-wrapper">
+          <input v-model="password2" :type="showPassword2 ? 'text' : 'password'" class="todo-input auth-input pw-input"
+            @keyup.enter="register()" />
+          <span class="eye-toggle" @click="showPassword2 = !showPassword2">
+            <svg v-if="showPassword2" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#999" stroke-width="2">
+              <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/>
+              <line x1="1" y1="1" x2="23" y2="23"/>
+            </svg>
+            <svg v-else viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#999" stroke-width="2">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+          </span>
+        </div>
+      </template>
 
       <!-- Submit button -->
       <div
@@ -277,8 +311,8 @@ onMounted(() => {
 
 /* ===== Auth Card ===== */
 .auth-container {
-  width: 420px;
-  padding: 44px 40px;
+  width: 380px;
+  padding: 36px 36px;
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(20px);
   border-radius: 20px;
@@ -334,6 +368,47 @@ onMounted(() => {
   margin-bottom: 14px;
   font-size: 13px;
   font-weight: 500;
+}
+
+/* ===== Labels ===== */
+.input-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #666;
+  margin-bottom: 6px;
+  padding-left: 4px;
+}
+
+/* ===== Password Wrapper ===== */
+.password-wrapper {
+  position: relative;
+  width: 100%;
+  margin-bottom: 14px;
+}
+
+.pw-input {
+  padding-right: 44px !important;
+  margin-bottom: 0 !important;
+}
+
+.eye-toggle {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  user-select: none;
+}
+
+.eye-toggle:hover {
+  background: rgba(113, 65, 168, 0.08);
 }
 
 /* ===== Inputs ===== */
