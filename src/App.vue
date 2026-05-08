@@ -242,120 +242,125 @@ onMounted(() => {
 </template>
 
 <style scoped>
+* {
+  transition: all 0.2s ease;
+}
+
+/* ===== Layout ===== */
 .todo-app {
   box-sizing: border-box;
-  margin-top: 40px;
-  margin-left: 1%;
-  padding: 30px 0 30px 0;
-  width: 98%;
-  min-height: 500px;
-  background: #ffffff;
+  padding: 30px 0;
+  width: 100%;
+  min-height: 100vh;
   color: #333;
-  border-radius: 5px;
 }
 
 .todo-app.auth-mode {
-  margin: 0;
-  width: 100%;
-  min-height: 100vh;
   background: transparent;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
+/* ===== Title ===== */
 .title {
   text-align: center;
-  font-size: 30px;
-  font-weight: 700;
-  margin-bottom: 20px;
+  font-size: 28px;
+  font-weight: 800;
+  margin-bottom: 8px;
+  background: linear-gradient(135deg, rgb(113, 65, 168), rgba(44, 114, 251, 1));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
-/* Header */
-.header {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  gap: 16px;
-  padding: 0 30px 20px 30px;
-  border-bottom: 1px solid #eee;
-  margin-bottom: 20px;
-}
-
-.user-info {
-  color: #666;
-  font-size: 14px;
-}
-
-.logout-btn {
-  color: rgb(113, 65, 168);
-  cursor: pointer;
-  font-size: 14px;
-  user-select: none;
-}
-
-.logout-btn:hover {
-  text-decoration: underline;
-}
-
-/* Auth */
+/* ===== Auth Card ===== */
 .auth-container {
-  width: 400px;
-  padding: 40px 36px;
-  background: #fff;
-  border-radius: 16px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15), 0 4px 16px rgba(0, 0, 0, 0.1);
+  width: 420px;
+  padding: 44px 40px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border-radius: 20px;
+  box-shadow: 0 24px 80px rgba(113, 65, 168, 0.15), 0 4px 20px rgba(0, 0, 0, 0.08);
+  animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .auth-tabs {
   display: flex;
   justify-content: center;
-  gap: 30px;
-  margin-bottom: 20px;
+  gap: 32px;
+  margin-bottom: 28px;
 }
 
 .auth-tabs span {
   cursor: pointer;
   font-size: 16px;
-  color: #999;
-  padding-bottom: 4px;
+  font-weight: 500;
+  color: #aaa;
+  padding-bottom: 6px;
   user-select: none;
+  border-bottom: 2px solid transparent;
 }
 
 .auth-tabs span.active {
   color: rgb(113, 65, 168);
-  border-bottom: 2px solid rgb(113, 65, 168);
+  border-bottom-color: rgb(113, 65, 168);
+  font-weight: 600;
 }
 
 .auth-error {
-  color: #e74c3c;
+  background: #fef2f2;
+  color: #dc2626;
   text-align: center;
-  margin-bottom: 12px;
-  font-size: 14px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  margin-bottom: 14px;
+  font-size: 13px;
+  font-weight: 500;
 }
 
 .auth-message {
-  color: #27ae60;
+  background: #f0fdf4;
+  color: #16a34a;
   text-align: center;
-  margin-bottom: 12px;
-  font-size: 14px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  margin-bottom: 14px;
+  font-size: 13px;
+  font-weight: 500;
 }
 
-.auth-input {
+/* ===== Inputs ===== */
+.auth-input,
+.code-input {
   width: 100%;
-  border-radius: 20px;
-  margin-bottom: 12px;
+  border-radius: 12px;
+  margin-bottom: 14px;
+  border: 1.5px solid #e5e7eb;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.auth-input:focus,
+.code-input:focus {
+  border-color: rgb(113, 65, 168);
+  box-shadow: 0 0 0 3px rgba(113, 65, 168, 0.1);
+  outline: none;
 }
 
 .code-row {
   display: flex;
   gap: 10px;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
 
 .code-input {
   flex: 1;
-  border-radius: 20px;
+  border-radius: 12px;
   min-width: 0;
 }
 
@@ -363,92 +368,164 @@ onMounted(() => {
   flex-shrink: 0;
   height: 50px;
   line-height: 50px;
-  padding: 0 16px;
-  border-radius: 20px;
-  background: linear-gradient(to right, rgb(113, 65, 168), rgba(44, 114, 251, 1));
+  padding: 0 18px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgb(113, 65, 168), rgba(44, 114, 251, 1));
   color: #fff;
   cursor: pointer;
   font-size: 13px;
+  font-weight: 600;
   user-select: none;
   white-space: nowrap;
 }
 
+.send-code-btn:hover:not(.disabled) {
+  transform: scale(1.03);
+  box-shadow: 0 4px 16px rgba(113, 65, 168, 0.3);
+}
+
 .send-code-btn.disabled {
-  opacity: 0.5;
+  opacity: 0.45;
   cursor: not-allowed;
 }
 
 .auth-button {
   width: 100%;
-  border-radius: 20px;
-  margin-top: 8px;
+  border-radius: 12px;
+  margin-top: 6px;
+  font-weight: 600;
+  font-size: 15px;
 }
 
-/* Todo */
+.auth-button:hover {
+  transform: scale(1.02);
+  box-shadow: 0 6px 24px rgba(113, 65, 168, 0.35);
+}
+
+/* ===== Todo Mode ===== */
+.header {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 16px;
+  padding: 0 30px 16px 30px;
+  border-bottom: 1px solid #eee;
+  margin-bottom: 24px;
+}
+
+.user-info {
+  color: #999;
+  font-size: 13px;
+}
+
+.logout-btn {
+  color: rgb(113, 65, 168);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  user-select: none;
+  padding: 4px 12px;
+  border-radius: 8px;
+}
+
+.logout-btn:hover {
+  background: rgba(113, 65, 168, 0.08);
+}
+
+/* ===== Todo Form ===== */
 .todo-form {
   display: flex;
   justify-content: center;
-  margin: 20px 0 30px 0;
-}
-
-.todo-button {
-  width: 100px;
-  height: 52px;
-  border-radius: 0 20px 20px 0;
-  text-align: center;
-  background: linear-gradient(
-    to right,
-    rgb(113, 65, 168),
-    rgba(44, 114, 251, 1)
-  );
-  color: #fff;
-  line-height: 52px;
-  cursor: pointer;
-  font-size: 14px;
-  user-select: none;
+  margin: 24px 0 28px 0;
 }
 
 .todo-input {
-  padding: 0px 15px 0px 15px;
-  border-radius: 20px 0 0 20px;
-  border: 1px solid #dfe1e5;
+  padding: 0 16px;
+  border-radius: 12px 0 0 12px;
+  border: 1.5px solid #e5e7eb;
   outline: none;
-  width: 60%;
+  width: 55%;
   height: 50px;
   box-sizing: border-box;
+  font-size: 15px;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-.item {
-  box-sizing: border-box;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 80%;
+.todo-input:focus {
+  border-color: rgb(113, 65, 168);
+  box-shadow: 0 0 0 3px rgba(113, 65, 168, 0.1);
+}
+
+.todo-button {
+  width: 110px;
   height: 50px;
-  margin: 8px auto;
-  padding: 16px;
-  border-radius: 20px;
-  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 20px;
-}
-
-.del {
-  color: red;
+  border-radius: 0 12px 12px 0;
+  text-align: center;
+  background: linear-gradient(135deg, rgb(113, 65, 168), rgba(44, 114, 251, 1));
+  color: #fff;
+  line-height: 50px;
   cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
   user-select: none;
 }
 
+.todo-button:hover {
+  box-shadow: 0 4px 16px rgba(113, 65, 168, 0.3);
+}
+
+/* ===== Todo Items ===== */
+.item,
 .completed {
   box-sizing: border-box;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  width: 80%;
-  height: 50px;
-  margin: 8px auto;
-  padding: 16px;
-  border-radius: 20px;
-  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 20px;
+  width: 70%;
+  height: 52px;
+  margin: 10px auto;
+  padding: 0 20px;
+  border-radius: 14px;
+  background: #fff;
+  border: 1px solid #f0f0f0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.item:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.completed {
+  opacity: 0.45;
   text-decoration: line-through;
-  opacity: 0.4;
+}
+
+.item input[type="checkbox"],
+.completed input[type="checkbox"] {
+  accent-color: rgb(113, 65, 168);
+  width: 18px;
+  height: 18px;
+  margin-right: 12px;
+  cursor: pointer;
+}
+
+.name {
+  font-size: 15px;
+}
+
+.del {
+  color: #ef4444;
+  cursor: pointer;
+  user-select: none;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: 8px;
+}
+
+.del:hover {
+  background: #fef2f2;
 }
 </style>
