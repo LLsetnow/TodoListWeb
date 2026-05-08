@@ -35,7 +35,7 @@ async function sendCode() {
   authError.value = ''
   authMessage.value = ''
   if (!email.value) {
-    authError.value = 'Please enter your email first'
+    authError.value = '请先输入邮箱'
     return
   }
   sending.value = true
@@ -49,7 +49,7 @@ async function sendCode() {
     authError.value = data.error
     return
   }
-  authMessage.value = 'Verification code sent. Check your email.'
+  authMessage.value = '验证码已发送，请查收邮件'
   countdown.value = 60
   countdownTimer = setInterval(() => {
     countdown.value--
@@ -82,15 +82,15 @@ async function register() {
   authError.value = ''
   authMessage.value = ''
   if (password.value !== password2.value) {
-    authError.value = 'Passwords do not match'
+    authError.value = '两次密码不一致'
     return
   }
   if (password.value.length < 6) {
-    authError.value = 'Password must be at least 6 characters'
+    authError.value = '密码至少需要6位'
     return
   }
   if (!verifyCode.value) {
-    authError.value = 'Please enter verification code'
+    authError.value = '请输入验证码'
     return
   }
   const res = await apiFetch('/register', {
@@ -102,7 +102,7 @@ async function register() {
     authError.value = data.error
     return
   }
-  authMessage.value = 'Registration successful! You can now login.'
+  authMessage.value = '注册成功！请登录'
   email.value = ''
   password.value = ''
   password2.value = ''
@@ -166,37 +166,37 @@ onMounted(() => {
         <span
           :class="{ active: authMode === 'login' }"
           @click="authMode = 'login'; authError = ''; authMessage = ''"
-        >Login</span>
+        >登录</span>
         <span
           :class="{ active: authMode === 'register' }"
           @click="authMode = 'register'; authError = ''; authMessage = ''"
-        >Register</span>
+        >注册</span>
       </div>
 
       <div v-if="authError" class="auth-error">{{ authError }}</div>
       <div v-if="authMessage" class="auth-message">{{ authMessage }}</div>
 
       <!-- Email -->
-      <input v-model="email" type="email" class="todo-input auth-input" placeholder="Email" />
+      <input v-model="email" type="email" class="todo-input auth-input" placeholder="邮箱" />
 
       <!-- Register mode: code + send button -->
       <div v-if="authMode === 'register'" class="code-row">
-        <input v-model="verifyCode" type="text" class="todo-input code-input" placeholder="Verification code" maxlength="6" />
+        <input v-model="verifyCode" type="text" class="todo-input code-input" placeholder="验证码" maxlength="6" />
         <div
           @click="sendCode"
           class="send-code-btn"
           :class="{ disabled: sending || countdown > 0 }"
         >
-          {{ countdown > 0 ? `${countdown}s` : sending ? '...' : 'Send Code' }}
+          {{ countdown > 0 ? `${countdown}s` : sending ? '...' : '发送验证码' }}
         </div>
       </div>
 
       <!-- Password -->
-      <input v-model="password" type="password" class="todo-input auth-input" placeholder="Password"
+      <input v-model="password" type="password" class="todo-input auth-input" placeholder="密码"
         @keyup.enter="authMode === 'login' ? login() : register()" />
 
       <!-- Confirm password (register only) -->
-      <input v-if="authMode === 'register'" v-model="password2" type="password" class="todo-input auth-input" placeholder="Confirm password"
+      <input v-if="authMode === 'register'" v-model="password2" type="password" class="todo-input auth-input" placeholder="确认密码"
         @keyup.enter="register()" />
 
       <!-- Submit button -->
@@ -204,7 +204,7 @@ onMounted(() => {
         @click="authMode === 'login' ? login() : register()"
         class="todo-button auth-button"
       >
-        {{ authMode === 'login' ? 'Login' : 'Register' }}
+        {{ authMode === 'login' ? '登录' : '注册' }}
       </div>
     </div>
 
@@ -212,7 +212,7 @@ onMounted(() => {
     <div v-else>
       <div class="header">
         <span class="user-info">{{ currentUser?.email }}</span>
-        <span @click="logout" class="logout-btn">Logout</span>
+        <span @click="logout" class="logout-btn">退出</span>
       </div>
 
       <div class="todo-form">
@@ -220,10 +220,10 @@ onMounted(() => {
           v-model="value"
           type="text"
           class="todo-input"
-          placeholder="Add a todo"
+          placeholder="添加待办"
           @keyup.enter="add"
         />
-        <div @click="add" class="todo-button">Add Todo</div>
+        <div @click="add" class="todo-button">添加</div>
       </div>
 
       <div
@@ -235,7 +235,7 @@ onMounted(() => {
           <input :checked="item.isCompleted" @change="toggle(item, $event.target.checked)" type="checkbox" />
           <span class="name">{{ item.value }}</span>
         </div>
-        <div @click="del(item)" class="del">del</div>
+        <div @click="del(item)" class="del">删除</div>
       </div>
     </div>
   </div>
@@ -259,7 +259,8 @@ onMounted(() => {
   background: transparent;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
+  padding-top: 12vh;
 }
 
 /* ===== Title ===== */
@@ -356,6 +357,7 @@ onMounted(() => {
   display: flex;
   gap: 10px;
   margin-bottom: 14px;
+  width: 100%;
 }
 
 .code-input {

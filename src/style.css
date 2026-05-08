@@ -1,8 +1,11 @@
 body {
   background: linear-gradient(
-    to right,
-    rgb(113, 65, 168),
-    rgba(44, 114, 251, 1)
+    135deg,
+    #c4b5d4 0%,
+    #b8c9e8 40%,
+    #c5d5e8 70%,
+    #d4c5dd 100%
   );
   color: #333;
+  min-height: 100vh;
 }

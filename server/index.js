@@ -106,8 +106,8 @@ app.post('/send-verify-code', checkDB, async (req, res) => {
         await resend.emails.send({
           from: 'Todo App <onboarding@resend.dev>',
           to: email,
-          subject: 'Verification Code',
-          html: `<p>Your verification code is:</p><h2 style="letter-spacing:6px">${code}</h2><p>This code expires in 10 minutes.</p>`,
+          subject: '邮箱验证码',
+          html: `<p>您的验证码是：</p><h2 style="letter-spacing:6px">${code}</h2><p>验证码 10 分钟内有效。</p>`,
         })
       } catch (e) {
         await db.collection('verify_codes').deleteOne({ email })
