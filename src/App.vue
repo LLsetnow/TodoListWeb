@@ -201,6 +201,7 @@ onMounted(() => {
       <label class="input-label">密码</label>
       <div class="password-wrapper">
         <input v-model="password" :type="showPassword ? 'text' : 'password'" class="todo-input auth-input pw-input"
+          :style="{ fontSize: showPassword ? '15px' : '20px', letterSpacing: showPassword ? '0px' : '3px' }"
           @keyup.enter="authMode === 'login' ? login() : register()" />
         <span class="eye-toggle" @click="showPassword = !showPassword">
           <svg v-if="showPassword" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#999" stroke-width="2">
@@ -219,6 +220,7 @@ onMounted(() => {
         <label class="input-label">确认密码</label>
         <div class="password-wrapper">
           <input v-model="password2" :type="showPassword2 ? 'text' : 'password'" class="todo-input auth-input pw-input"
+            :style="{ fontSize: showPassword2 ? '15px' : '20px', letterSpacing: showPassword2 ? '0px' : '3px' }"
             @keyup.enter="register()" />
           <span class="eye-toggle" @click="showPassword2 = !showPassword2">
             <svg v-if="showPassword2" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#999" stroke-width="2">
@@ -390,8 +392,6 @@ onMounted(() => {
 .pw-input {
   padding-right: 44px !important;
   margin-bottom: 0 !important;
-  font-size: 20px !important;
-  letter-spacing: 3px;
 }
 
 .eye-toggle {
