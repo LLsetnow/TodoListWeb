@@ -390,6 +390,8 @@ onMounted(() => {
 .pw-input {
   padding-right: 44px !important;
   margin-bottom: 0 !important;
+  font-size: 20px !important;
+  letter-spacing: 3px;
 }
 
 .eye-toggle {
