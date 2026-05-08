@@ -221,11 +221,11 @@ app.post('/delete-user', checkDB, async (req, res) => {
 app.get('/fetch_tasks', checkDB, authMiddleware, async (req, res) => {
   try {
     const tasks = await db.collection('tasks').find({ userId: req.userId }).toArray()
-    res.json(tasks.map(t => ({
+    res.json({ code: 0, data: tasks.map(t => ({
       id: t._id,
       value: t.value,
       isCompleted: t.isCompleted || false,
-    })))
+    })) })
   } catch (e) {
     res.json({ code: 1, error: e.message })
   }

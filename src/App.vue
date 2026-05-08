@@ -127,7 +127,7 @@ async function fetchTasks() {
     list.value = []
     return
   }
-  list.value = data
+  list.value = data.data || []
 }
 
 async function add() {
