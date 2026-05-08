@@ -354,7 +354,8 @@ onMounted(() => {
 }
 
 .auth-input {
-  border-radius: 12px;
+  width: 100% !important;
+  border-radius: 12px !important;
 }
 
 .code-row {
@@ -366,22 +367,9 @@ onMounted(() => {
 
 .code-input {
   flex: 1;
-  border-radius: 12px;
+  border-radius: 12px !important;
   min-width: 0;
   margin-bottom: 0;
-}
-
-.code-row {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 14px;
-  width: 100%;
-}
-
-.code-input {
-  flex: 1;
-  border-radius: 12px;
-  min-width: 0;
 }
 
 .send-code-btn {
@@ -410,8 +398,8 @@ onMounted(() => {
 }
 
 .auth-button {
-  width: 100%;
-  border-radius: 12px;
+  width: 100% !important;
+  border-radius: 12px !important;
   margin-top: 6px;
   font-weight: 600;
   font-size: 15px;
