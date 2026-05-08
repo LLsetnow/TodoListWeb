@@ -22,15 +22,29 @@
 
 ## 效果截图
 
-| 登录 | 注册 |
-|------|------|
-| ![登录](assert/登录.png) | ![注册](assert/注册.png) |
+<table>
+  <tr>
+    <td align="center"><b>登录</b></td>
+    <td align="center"><b>注册</b></td>
+  </tr>
+  <tr>
+    <td><img src="assert/登录.png" width="400" /></td>
+    <td><img src="assert/注册.png" width="400" /></td>
+  </tr>
+</table>
 
-| 邮箱验证 | 代办事项 |
-|------|------|
-| ![邮箱验证](assert/邮箱验证.png) | ![代办事项](assert/代办事项效果1.png) |
+<table>
+  <tr>
+    <td align="center"><b>邮箱验证</b></td>
+    <td align="center"><b>代办事项</b></td>
+  </tr>
+  <tr>
+    <td><img src="assert/邮箱验证.png" width="400" /></td>
+    <td><img src="assert/代办事项效果1.png" width="400" /></td>
+  </tr>
+</table>
 
-![代办事项2](assert/代办事项效果2.png)
+<p align="center"><img src="assert/代办事项效果2.png" width="400" /></p>
 
 ## 快速开始
 
