@@ -13,6 +13,8 @@ export default defineConfig({
       '/register': 'http://localhost:3000',
       '/login': 'http://localhost:3000',
       '/verify-email': 'http://localhost:3000',
+      '/send-verify-code': 'http://localhost:3000',
+      '/delete-user': 'http://localhost:3000',
     },
   },
 })
