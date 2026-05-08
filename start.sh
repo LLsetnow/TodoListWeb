@@ -11,4 +11,5 @@ npm run build
 
 echo "=== Start server ==="
 echo "Server will run on http://0.0.0.0:${PORT:-3000}"
+fuser -k ${PORT:-3000}/tcp 2>/dev/null || true
 npm run server
