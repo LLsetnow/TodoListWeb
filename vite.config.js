@@ -10,6 +10,9 @@ export default defineConfig({
       '/add_task': 'http://localhost:3000',
       '/delete_task': 'http://localhost:3000',
       '/toggle_complete': 'http://localhost:3000',
+      '/register': 'http://localhost:3000',
+      '/login': 'http://localhost:3000',
+      '/verify-email': 'http://localhost:3000',
     },
   },
 })

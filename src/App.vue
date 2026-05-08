@@ -3,65 +3,170 @@ import { ref, onMounted } from 'vue'
 
 const BASE = import.meta.env.VITE_API_BASE || ''
 
+const authToken = ref(localStorage.getItem('authToken') || '')
+const currentUser = ref(JSON.parse(localStorage.getItem('currentUser') || 'null'))
+const authMode = ref('login')
+const authError = ref('')
+const authMessage = ref('')
+const email = ref('')
+const password = ref('')
+
 const value = ref('')
 const list = ref([])
 
+async function apiFetch(path, options = {}) {
+  const headers = { ...options.headers }
+  if (authToken.value) {
+    headers['Authorization'] = `Bearer ${authToken.value}`
+  }
+  if (options.body && typeof options.body === 'string') {
+    headers['Content-Type'] = headers['Content-Type'] || 'application/json'
+  }
+  return fetch(`${BASE}${path}`, { ...options, headers })
+}
+
+async function login() {
+  authError.value = ''
+  const res = await apiFetch('/login', {
+    method: 'POST',
+    body: JSON.stringify({ email: email.value, password: password.value }),
+  })
+  const data = await res.json()
+  if (data.code !== 0) {
+    authError.value = data.error
+    return
+  }
+  authToken.value = data.data.token
+  currentUser.value = { userId: data.data.userId, email: email.value }
+  localStorage.setItem('authToken', data.data.token)
+  localStorage.setItem('currentUser', JSON.stringify(currentUser.value))
+  fetchTasks()
+}
+
+async function register() {
+  authError.value = ''
+  authMessage.value = ''
+  const res = await apiFetch('/register', {
+    method: 'POST',
+    body: JSON.stringify({ email: email.value, password: password.value }),
+  })
+  const data = await res.json()
+  if (data.code !== 0) {
+    authError.value = data.error
+    return
+  }
+  authMessage.value = data.message
+  email.value = ''
+  password.value = ''
+}
+
+function logout() {
+  authToken.value = ''
+  currentUser.value = null
+  localStorage.removeItem('authToken')
+  localStorage.removeItem('currentUser')
+  list.value = []
+}
+
 async function fetchTasks() {
-  const res = await fetch(`${BASE}/fetch_tasks`)
-  list.value = await res.json()
+  const res = await apiFetch('/fetch_tasks')
+  const data = await res.json()
+  if (data.code !== 0) {
+    list.value = []
+    return
+  }
+  list.value = data
 }
 
 async function add() {
   if (!value.value.trim()) return
-  await fetch(`${BASE}/add_task`, {
+  await apiFetch('/add_task', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ value: value.value, isCompleted: false }),
   })
   value.value = ''
   fetchTasks()
 }
 
-async function del(item, index) {
-  await fetch(`${BASE}/delete_task?id=${item.id}`, { method: 'POST' })
+async function del(item) {
+  await apiFetch(`/delete_task?id=${item.id}`, { method: 'POST' })
   fetchTasks()
 }
 
 async function toggle(item, checked) {
-  await fetch(`${BASE}/toggle_complete?id=${item.id}`, {
+  await apiFetch(`/toggle_complete?id=${item.id}`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ isCompleted: checked }),
   })
   fetchTasks()
 }
 
-onMounted(fetchTasks)
+onMounted(() => {
+  if (authToken.value) fetchTasks()
+})
 </script>
+
 <template>
   <div class="todo-app">
-    <div class="title">Todo App</div>
+    <!-- Auth UI -->
+    <div v-if="!authToken" class="auth-container">
+      <div class="title">Todo App</div>
 
-    <div class="todo-form">
-      <input
-        v-model="value"
-        type="text"
-        class="todo-input"
-        placeholder="Add a todo"
-      />
-      <div @click="add" class="todo-button">Add Todo</div>
-    </div>
-
-    <div
-      v-for="(item, index) in list"
-      :class="[item.isCompleted ? 'completed' : 'item']"
-    >
-      <div>
-        <input :checked="item.isCompleted" @change="toggle(item, $event.target.checked)" type="checkbox" />
-        <span class="name">{{ item.value }}</span>
+      <div class="auth-tabs">
+        <span
+          :class="{ active: authMode === 'login' }"
+          @click="authMode = 'login'; authError = ''; authMessage = ''"
+        >Login</span>
+        <span
+          :class="{ active: authMode === 'register' }"
+          @click="authMode = 'register'; authError = ''; authMessage = ''"
+        >Register</span>
       </div>
 
-      <div @click="del(item, index)" class="del">del</div>
+      <div v-if="authError" class="auth-error">{{ authError }}</div>
+      <div v-if="authMessage" class="auth-message">{{ authMessage }}</div>
+
+      <input v-model="email" type="email" class="todo-input" placeholder="Email" />
+      <input v-model="password" type="password" class="todo-input" placeholder="Password"
+        @keyup.enter="authMode === 'login' ? login() : register()" />
+
+      <div
+        @click="authMode === 'login' ? login() : register()"
+        class="todo-button auth-button"
+      >
+        {{ authMode === 'login' ? 'Login' : 'Register' }}
+      </div>
+    </div>
+
+    <!-- Todo UI -->
+    <div v-else>
+      <div class="header">
+        <span class="user-info">{{ currentUser?.email }}</span>
+        <span @click="logout" class="logout-btn">Logout</span>
+      </div>
+
+      <div class="todo-form">
+        <input
+          v-model="value"
+          type="text"
+          class="todo-input"
+          placeholder="Add a todo"
+          @keyup.enter="add"
+        />
+        <div @click="add" class="todo-button">Add Todo</div>
+      </div>
+
+      <div
+        v-for="item in list"
+        :key="item.id"
+        :class="[item.isCompleted ? 'completed' : 'item']"
+      >
+        <div>
+          <input :checked="item.isCompleted" @change="toggle(item, $event.target.checked)" type="checkbox" />
+          <span class="name">{{ item.value }}</span>
+        </div>
+        <div @click="del(item)" class="del">del</div>
+      </div>
     </div>
   </div>
 </template>
@@ -83,8 +188,90 @@ onMounted(fetchTasks)
   text-align: center;
   font-size: 30px;
   font-weight: 700;
+  margin-bottom: 20px;
 }
 
+/* Header */
+.header {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 16px;
+  padding: 0 30px 20px 30px;
+  border-bottom: 1px solid #eee;
+  margin-bottom: 20px;
+}
+
+.user-info {
+  color: #666;
+  font-size: 14px;
+}
+
+.logout-btn {
+  color: rgb(113, 65, 168);
+  cursor: pointer;
+  font-size: 14px;
+  user-select: none;
+}
+
+.logout-btn:hover {
+  text-decoration: underline;
+}
+
+/* Auth */
+.auth-container {
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.auth-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  margin-bottom: 20px;
+}
+
+.auth-tabs span {
+  cursor: pointer;
+  font-size: 16px;
+  color: #999;
+  padding-bottom: 4px;
+  user-select: none;
+}
+
+.auth-tabs span.active {
+  color: rgb(113, 65, 168);
+  border-bottom: 2px solid rgb(113, 65, 168);
+}
+
+.auth-error {
+  color: #e74c3c;
+  text-align: center;
+  margin-bottom: 12px;
+  font-size: 14px;
+}
+
+.auth-message {
+  color: #27ae60;
+  text-align: center;
+  margin-bottom: 12px;
+  font-size: 14px;
+}
+
+.auth-container .todo-input {
+  width: 100%;
+  border-radius: 20px;
+  margin-bottom: 12px;
+}
+
+.auth-button {
+  width: 100%;
+  border-radius: 20px;
+  margin-top: 8px;
+}
+
+/* Todo */
 .todo-form {
   display: flex;
   justify-content: center;
@@ -116,6 +303,7 @@ onMounted(fetchTasks)
   outline: none;
   width: 60%;
   height: 50px;
+  box-sizing: border-box;
 }
 
 .item {
@@ -133,6 +321,8 @@ onMounted(fetchTasks)
 
 .del {
   color: red;
+  cursor: pointer;
+  user-select: none;
 }
 
 .completed {
