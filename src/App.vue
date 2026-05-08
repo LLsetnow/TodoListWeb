@@ -566,7 +566,7 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  width: 18%;
+  width: 35%;
   height: 52px;
   margin: 10px auto;
   padding: 0 20px;
