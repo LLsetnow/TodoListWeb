@@ -1,3 +1,4 @@
+import 'dotenv/config'
 import express from 'express'
 import { MongoClient } from 'mongodb'
 import bcrypt from 'bcryptjs'
@@ -17,7 +18,7 @@ if (!JWT_SECRET) {
   process.exit(1)
 }
 
-const resend = RESEND_API_KEY ? new Resend(RESEND_API_KEY) : null
+const resend = RESEND_API_KEY && RESEND_API_KEY !== 're_placeholder' ? new Resend(RESEND_API_KEY) : null
 
 const app = express()
 app.use(express.json())
@@ -47,7 +48,11 @@ async function connectDB() {
   }
 }
 
-// Auth middleware
+function checkDB(req, res, next) {
+  if (!db) return res.status(503).json({ code: 1, error: 'Database not available' })
+  next()
+}
+
 function authMiddleware(req, res, next) {
   const header = req.headers.authorization
   if (!header || !header.startsWith('Bearer ')) {
@@ -62,8 +67,9 @@ function authMiddleware(req, res, next) {
   }
 }
 
-// POST /register
-app.post('/register', async (req, res) => {
+// === Auth routes (public) ===
+
+app.post('/register', checkDB, async (req, res) => {
   try {
     const { email, password } = req.body
     if (!email || !password) {
@@ -112,8 +118,7 @@ app.post('/register', async (req, res) => {
   }
 })
 
-// POST /login
-app.post('/login', async (req, res) => {
+app.post('/login', checkDB, async (req, res) => {
   try {
     const { email, password } = req.body
     if (!email || !password) {
@@ -141,8 +146,7 @@ app.post('/login', async (req, res) => {
   }
 })
 
-// GET /verify-email
-app.get('/verify-email', async (req, res) => {
+app.get('/verify-email', checkDB, async (req, res) => {
   try {
     const { token } = req.query
     if (!token) {
@@ -162,8 +166,9 @@ app.get('/verify-email', async (req, res) => {
   }
 })
 
-// Task routes (require auth)
-app.get('/fetch_tasks', authMiddleware, async (req, res) => {
+// === Task routes (require auth) ===
+
+app.get('/fetch_tasks', checkDB, authMiddleware, async (req, res) => {
   try {
     const tasks = await db.collection('tasks').find({ userId: req.userId }).toArray()
     res.json(tasks.map(t => ({
@@ -176,7 +181,7 @@ app.get('/fetch_tasks', authMiddleware, async (req, res) => {
   }
 })
 
-app.post('/add_task', authMiddleware, async (req, res) => {
+app.post('/add_task', checkDB, authMiddleware, async (req, res) => {
   try {
     const { value, isCompleted = false } = req.body
     if (!value) return res.json({ code: 1, error: 'value is required' })
@@ -188,7 +193,7 @@ app.post('/add_task', authMiddleware, async (req, res) => {
   }
 })
 
-app.post('/delete_task', authMiddleware, async (req, res) => {
+app.post('/delete_task', checkDB, authMiddleware, async (req, res) => {
   try {
     const { id } = req.query
     if (!id) return res.json({ code: 1, error: 'id is required' })
@@ -199,7 +204,7 @@ app.post('/delete_task', authMiddleware, async (req, res) => {
   }
 })
 
-app.post('/toggle_complete', authMiddleware, async (req, res) => {
+app.post('/toggle_complete', checkDB, authMiddleware, async (req, res) => {
   try {
     const { id } = req.query
     const { isCompleted } = req.body
@@ -211,6 +216,6 @@ app.post('/toggle_complete', authMiddleware, async (req, res) => {
   }
 })
 
-connectDB().then(() => {
-  app.listen(PORT, '0.0.0.0', () => console.log(`Server running on http://0.0.0.0:${PORT}`))
-})
+// Start server regardless of DB status
+connectDB()
+app.listen(PORT, '0.0.0.0', () => console.log(`Server running on http://0.0.0.0:${PORT}`))
