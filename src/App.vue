@@ -157,7 +157,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="todo-app">
+  <div class="todo-app" :class="{ 'auth-mode': !authToken }">
     <!-- Auth UI -->
     <div v-if="!authToken" class="auth-container">
       <div class="title">Todo App</div>
@@ -254,6 +254,16 @@ onMounted(() => {
   border-radius: 5px;
 }
 
+.todo-app.auth-mode {
+  margin: 0;
+  width: 100%;
+  min-height: 100vh;
+  background: transparent;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .title {
   text-align: center;
   font-size: 30px;
@@ -290,9 +300,11 @@ onMounted(() => {
 
 /* Auth */
 .auth-container {
-  max-width: 400px;
-  margin: 0 auto;
-  padding: 20px;
+  width: 400px;
+  padding: 40px 36px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15), 0 4px 16px rgba(0, 0, 0, 0.1);
 }
 
 .auth-tabs {
